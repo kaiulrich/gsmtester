@@ -8,6 +8,8 @@ var express = require('express')
 ,   os = require('os')
 ,   exec = require('child_process').exec;
 
+io.set('log level',3);
+
 // APN und emobility backend parameter
 var apn = conf.apn;
 var username = conf.username;
@@ -24,7 +26,8 @@ app.configure(function(){
 });
 
 app.get('/tester', function (req, res) {
-	console.log("Tester connected from backend.");
+	io.sockets.emit('tester.info', { zeit: new Date(), title: '', text: 'Emobility backend answered.', showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
+	io.sockets.emit('tester.info', { zeit: new Date(), title: 'SIMCARD NETWORK IS OK', text: '', showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
 	res.end( "{\"status\":\"success\"}");   
 })
 
@@ -49,12 +52,16 @@ io.sockets.on('connection', function (socket) {
 		  		 	
  		    io.sockets.emit('tester.info', { zeit: new Date(), text: 'Connecting host ' + serverurl + ' ...', showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
 		    //making the https get call
-		    var ppp0Ip = "";
-		    //ppp0Ip = os.networkInterfaces().ppp0[0].address
+		    if(os.networkInterfaces().ppp0 == null){
+			io.sockets.emit('tester.info', { zeit: new Date(), title: 'Error: ', text: 'No modem found.', showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
+			return;
+		    }
+		    var ppp0Ip = os.networkInterfaces().ppp0[0].address
 		    var options = {
 			host :  serverurl,
 			port : 443,
-			path : '/tester?ip=' + ppp0Ip,
+			path : '/tester/' + ppp0Ip + '/' + conf.port,
+			//path: '/status',			
 			method : 'GET',
 			rejectUnauthorized: false
 		    }
@@ -63,13 +70,17 @@ io.sockets.on('connection', function (socket) {
 			var title = ''
 		        if(res.statusCode == '200'){
 				title = 'SIMCARD CONFIGURATION OK'
-				mesg = 'emobility server is reachable (status=200)' ; 			
+				mesg = 'emobility server is reachable (status=200)' ; 
+				io.sockets.emit('tester.info', { zeit: new Date(),  title: '', text: mesg,  showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
+			        io.sockets.emit('tester.info', { zeit: new Date(),  title: title, text: '',  showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});			
+				io.sockets.emit('tester.info', { zeit: new Date(),  title: '', text: 'Waiting for Backend ....',  showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});				
 			}else{
 				title = 'SIMCARD CONFIGURATION NOT OK'
 				mesg = 'emobility server is not reachable (status=' + res.statusCode + ')' ; 	
+				io.sockets.emit('tester.info', { zeit: new Date(),  title: '', text: mesg,  showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
+				io.sockets.emit('tester.info', { zeit: new Date(),  title: title, text: '',  showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
 			}
-			io.sockets.emit('tester.info', { zeit: new Date(),  title: '', text: mesg,  showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
-			io.sockets.emit('tester.info', { zeit: new Date(),  title: title, text: '',  showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
+			
 			
 		    });
 		 

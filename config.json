@@ -1,9 +1,9 @@
 {
-	"port": 8085,
+	"port": 13000,
 	"apn": "cda.vodafone.de",
 	"username": "491749916295@snhh-estation.de",
 	"passwort": "sommer2015",
-	"serverurl": "212.1.61.20",
+	"serverurl": "212.1.61.23",
 	"usbinterface": 0,
 	"usbmodem": "12d1:1001"
 }
