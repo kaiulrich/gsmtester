@@ -45,7 +45,7 @@ io.sockets.on('connection', function (socket) {
 		serverurl = data.serverurl;
 		io.sockets.emit('tester.info', { zeit: new Date(), title: 'Connecting modem....', text: '', showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
 		
-		exec("sakis3g connect --console --nostorage --pppd APN=\"CUSTOM_APN\" CUSTOM_APN=\"" + apn + "\" APN_USER=\""+username+"\" APN_PASS=\""+passwort+"\" USBINTERFACE=\"0\" USBDRIVER=\"option\" OTHER=\"USBMODEM\" USBMODEM=\""+conf.usbmodem+"\"", 
+		exec("sakis3g connect --sudo --console --nostorage --pppd APN=\"CUSTOM_APN\" CUSTOM_APN=\"" + apn + "\" APN_USER=\""+username+"\" APN_PASS=\""+passwort+"\" USBINTERFACE=\"0\" USBDRIVER=\"option\" OTHER=\"USBMODEM\" USBMODEM=\""+conf.usbmodem+"\"", 
 			function (error, stdout, stderr) {
 			  
 		    io.sockets.emit('tester.info', { zeit: new Date(), text: stdout, showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
@@ -102,7 +102,7 @@ io.sockets.on('connection', function (socket) {
 		passwort =  data.passwort;
 		serverurl = data.serverurl;
 		io.sockets.emit('tester.info', { zeit: new Date(), title: 'Disconnect modem ...', text: '', showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
-		exec("sakis3g disconnect --console --nostorage USBDRIVER=\"option\" OTHER=\"USBMODEM\" USBMODEM=\"12d1:1001\"", 
+		exec("sakis3g disconnect --sudo --console --nostorage USBDRIVER=\"option\" OTHER=\"USBMODEM\" USBMODEM=\"12d1:1001\"", 
 			function (error, stdout, stderr) {
 			  io.sockets.emit('tester.info', { zeit: new Date(), text: stdout, showconf: false, apn: apn, username: username, passwort: passwort, serverurl: serverurl});
 		});
